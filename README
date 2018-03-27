@@ -1,0 +1,28 @@
+#!/bin/bash
+
+VERSION=0.0.1
+
+#########################################################################################
+#
+# 4Toolz Collection 0.0.1 (4Toolz)
+#
+# Idea / Written by Sebastian Vivian Gresser - All Rights Reserved
+#
+# Copyright (C) by geeBee UG (haftungsbeschränkt) - All Rights Reserved
+# Copyright (C) by Sebastian Vivian Gresser - All Rights Reserved
+#
+#########################################################################################
+#
+# CONTENTS:
+#
+###########################
+#
+# <->4utoBl4ck: will blackhole any suspicious ips or domains in the domainlist
+# with cron you can add this to auto-blackhole any network if you have their
+# load balance domain names
+#  |-> 4utoBl4ck needs Grsecurity's blackhole patch for ip route to work properly!!!
+#
+###########################
+#
+# ...
+#
