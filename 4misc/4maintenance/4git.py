@@ -17,7 +17,7 @@ try:
     src_dirs=sys.argv[1]
 except:
     src_dirs=os.getcwd()
-    print("no source dir specified | usage update_sources.py directory \nFalling back to cwd..."+src_dirs)
+    print("no source dir specified | usage 4git.py directory \nFalling back to cwd..."+src_dirs)
 
 
 for sdir in os.walk(src_dirs):    
@@ -26,10 +26,7 @@ for sdir in os.walk(src_dirs):
         cmd=["screen", "-dmt", "git_repo_worker", "git", "-C", sdir, "pull"]
         print(cmd)
         subprocess.Popen(cmd)
-    else:
-        continue
-            
-            
+
 
 
 
