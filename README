@@ -1,10 +1,10 @@
 #!/bin/bash
 
-VERSION=0.0.1
+VERSION=0.0.4
 
 ##########################################################################################
 #                                                                                        #
-# 4Toolz Collection 0.0.1 (4Toolz)                                                       #
+# 4Toolz Collection 0.0.4 (4Toolz)                                                       #
 #                                                                                        #
 # Idea / Written by Sebastian Vivian Gresser - All Rights Reserved                       #
 #                                                                                        #
@@ -31,9 +31,16 @@ VERSION=0.0.1
 #                                                                                        #
 ###################################### 4MAINTENANCE ######################################
 #                                                                                        #
-# <->4git: will start multiple based git pull processes                                  #
+# <->4git: will start multiple based git pull or clone processes                         #
 #  |->                                                                                   #
 #  with cron you can add this to update your git repo collection regularly               #
+#                                                                                        #
+#                                                                                        #
+######################################## 4BACKUP #########################################
+#                                                                                        #
+# <->mkstage4_gentoo: will create a stage 4 of your operating system                     #
+#  |->                                                                                   #
+#  usefull tool for backup and making your own linux repo stage4s                        #
 #                                                                                        #
 #                                                                                        #
 ##########################################################################################
