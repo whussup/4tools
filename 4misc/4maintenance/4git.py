@@ -13,8 +13,12 @@
 # number of parallel update processes
 max_count=10
 
-import os, sys, re, subprocess, time, inspect
+import os, sys, re, subprocess, time, inspect, requests
 
+repositories=re.compile("<div\sclass=\"d-inline-block.*?\">.*?<h3>.*?<a\shref=\"(.*?)\"\sitemprop=\"name.*?\">(.*?)</a>.*?</h3>.*?</div>", re.S)
+repo_name=re.compile("https://github.com/(.*?)/")
+pages=re.compile("<div\sclass=\"pagination\">(.*?)</div>")
+pages_ints=re.compile("<a\srel=\"next\"\shref=\".*?\">(.*?)</a>")
 regx=re.compile("git pull")
 
 def procs_count():
@@ -23,33 +27,82 @@ def procs_count():
     procs=str(subprocess.check_output(cmd))
     return int(len(regx.findall(procs)))
 
+def dump_repos(url, dr):
+    r=requests.get(url)
+    rps=repositories.findall(r.text)
+    if rps != []:
+        link=rps[0]
+        name=rps[1]
+        sdir = src_dirs
+        for rp in rps:
+            cmd=["git", "clone", "https://github.com"+rp[0], ]
+            print(cmd)
+            procs.append(subprocess.Popen(cmd, cwd=dr))
+
+
 try:
-    src_dirs=sys.argv[1]
+    cmd = sys.argv[1]
+    if cmd == "update":
+        try:
+            src_dirs=sys.argv[2]
+        except:
+            print("no source dir specified | usage 4git.py update directory count cmds\nFalling back to cwd..."+src_dirs)
+        try:
+            src_dirs=int(sys.argv[3])
+        except:
+            print("no max_count specified | usage 4git.py update directory count cmds\nFalling back to max_count:"+str(max_count))
+    elif cmd == "clone":
+        try:
+            url=sys.argv[2]
+            rname=repo_name.findall(url)
+            if rname == []:
+                ""+1
+            r=requests.get(url)
+        except:
+            print("no valid url specified | usage 4git.py clone git_repo_url directory count \n")
+        try:
+            src_dirs=sys.argv[3]
+        except:
+            print("no source destination specified | usage 4git.py clone git_repo_url directory count \nFalling back to cwd..."+src_dirs)
+        try:
+            src_dirs=int(sys.argv[3])
+        except:
+            print("no max_count specified | usage 4git.py clone git_repo_url directory count \nFalling back to max_count:"+str(max_count))  
 except:
-    src_dirs=os.getcwd()
-    print("no source dir specified | usage 4git.py directory count \nFalling back to cwd..."+src_dirs)
-try:
-    src_dirs=int(sys.argv[2])
-except:
-    print("no max_count specified | usage 4git.py directory count \nFalling back to max_count:"+str(max_count))
+    print("no valid cmd specified | valid cmds clone, update")
+    print("usage 4git.py clone git_repo_url directory count ")
+    print("usage 4git.py update directory count ")
+    exit()
 
 procs=[]
 
-for sdir in os.walk(src_dirs):    
-    if(os.path.isdir(sdir[0]+"/.git")):
-        sdir = sdir[0]
-        cmd=["git", "pull"]
-        print(cmd)
-        procs.append(subprocess.Popen(cmd, cwd=sdir))
-        i=procs_count()
-        while i > max_count:
+if cmd == "update":
+    for sdir in os.walk(src_dirs):
+        if(os.path.isdir(sdir[0]+"/.git")):
+            sdir = sdir[0]
+            cmd=["git", "pull"]
+            procs.append(subprocess.Popen(cmd, cwd=sdir))
             i=procs_count()
-            print("waiting for empty workspace...max_count:"+str(max_count))
-            time.sleep(1)
+            while i > max_count:
+                i=procs_count()
+                print("waiting for empty workspace...max_count:"+str(max_count))
+                time.sleep(1)
 
-
-
-
-
-
-
+elif cmd == "clone":
+    pgs=[]
+    rname=repo_name.findall(url)
+    rname=rname[0]
+    cmd=["mkdir",rname]
+    try:
+        procs.append(subprocess.Popen(cmd, cwd=src_dirs))
+    except:
+        print("reponame already exists continuing with cloning...")
+    pgs=pages.findall(r.text)
+    pgs_ints=pages_ints.findall(pgs[0])
+    dump_repos(url, src_dirs+"/"+rname)
+    for pg in pgs_ints:
+        try:
+            url_=url+"?page="+str(int(pg))
+        except:
+            continue
+        dump_repos(url_, src_dirs+"/"+rname)
