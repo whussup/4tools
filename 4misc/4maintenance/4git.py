@@ -19,10 +19,10 @@ repositories=re.compile("<div\sclass=\"d-inline-block.*?\">.*?<h3>.*?<a\shref=\"
 repo_name=re.compile("https://github.com/(.*?)/")
 pages=re.compile("<div\sclass=\"pagination\">(.*?)</div>")
 pages_ints=re.compile("<a\srel=\"next\"\shref=\".*?\">(.*?)</a>")
-regx=re.compile("git pull")
+regx_update=re.compile("git pull")
+regx_clone=re.compile("git clone")
 
-def procs_count():
-    global regx
+def procs_count(regx):
     cmd=["ps", "ax"]
     procs=str(subprocess.check_output(cmd))
     return int(len(regx.findall(procs)))
@@ -41,10 +41,10 @@ def dump_repos(url, dr, response=False):
             cmd=["git", "clone", "https://github.com"+rp[0], ]
             print(cmd)
             procs.append(subprocess.Popen(cmd, cwd=dr))
-            i=procs_count()
+            i=procs_count(regx_clone)
             print(i)
             while i > max_count:
-                i=procs_count()
+                i=procs_count(regx_clone)
                 print("waiting for empty workspace...max_count:"+str(max_count))
                 time.sleep(1)
 try:
@@ -89,9 +89,9 @@ if cmd == "update":
             sdir = sdir[0]
             cmd=["git", "pull"]
             procs.append(subprocess.Popen(cmd, cwd=sdir))
-            i=procs_count()
+            i=procs_count(regx_update)
             while i > max_count:
-                i=procs_count()
+                i=procs_count(regx_update)
                 print("waiting for empty workspace...max_count:"+str(max_count))
                 time.sleep(1)
 
