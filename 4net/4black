@@ -22,7 +22,7 @@ VERSION=0.0.2
 #
 activate_banish_cidr=1
 
-domainlist=("asdf.de" 1 "github.com" 0)
+domainlist=()
 
 for (( i=0; i<${#domainlist[@]}; i+=2 ))
 do
