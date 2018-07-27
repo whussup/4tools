@@ -107,7 +107,6 @@ elif cmd == "clone":
         rname=search_regx.findall(url)
         rname=rname[0].replace("+", "_")
     cmd=["mkdir",rname]
-    r=requests.get(url)
     try:
         procs.append(subprocess.Popen(cmd, cwd=src_dirs))
     except:
