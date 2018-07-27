@@ -102,7 +102,7 @@ elif cmd == "clone":
     pgs=[]
     if url.find("?q=") == -1:
         rname=repo_name.findall(url)
-        rname=rname[0]
+        rname=rname[0]+"?tab=repositories"
     else:
         rname=search_regx.findall(url)
         rname=rname[0].replace("+", "_")
