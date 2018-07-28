@@ -16,21 +16,22 @@
 
 # number of parallel update processes
 max_count=10
+# change this settings for not using github
+# should work for any webinterface based github clone
+parent_url="https://github.com"
+repos_url_add="?tab=repositories"
 
-import os, sys, re, subprocess, time, inspect, requests
-
-repositories=re.compile("<div.*?>.*?<h3>.*?<a.*?href=\"(.*?)\".*?>.*?</a>.*?</h3>.*?</div>", re.S)
-repo_name=re.compile("https://github.com/(.*?)$")
+import os, sys, re, subprocess, time, requests
+repositories=re.compile("<h3.*?>.*?<a.*?href=\"(.*?)\".*?>.*?</a>.*?</h3>", re.S)
+repo_name=re.compile(parent_url+"/(.*?)$")
 search_regx=re.compile(".*?search\?q\=(.*?)$")
 regx_update=re.compile("git pull")
 regx_clone=re.compile("git clone")
-next_page_regx=re.compile("<a\sclass=\"next_page\"\srel=\"next\"\shref=\"(.*?)\">Next")
-
+next_page_regx=re.compile("rel=\"next\".*?href=\"(.*?)\">(.*?)</a>")
 def procs_count(regx):
     cmd=["ps", "ax"]
     procs=str(subprocess.check_output(cmd))
     return int(len(regx.findall(procs)))
-
 def dump_repos(url, dr):
     r=requests.get(url)
     next_page = next_page_regx.findall(r.text)
@@ -38,20 +39,21 @@ def dump_repos(url, dr):
     if rps != []:
         sdir = src_dirs
         for rp in rps:
-            cmd=["git", "clone", "https://github.com"+rp]
-            print(cmd)
+            cmd=["git", "clone", parent_url+rp]
             procs.append(subprocess.Popen(cmd, cwd=dr))
             i=procs_count(regx_clone)
-            print(i)
             while i > max_count:
                 i=procs_count(regx_clone)
                 print("waiting for empty workspace...max_count:"+str(max_count))
-                time.sleep(1)
+                time.sleep(7)
     if next_page != []:
-        next_page = next_page[0]
-        dump_repos("https://github.com"+next_page, dr)
+        next_page = next_page.pop()[0]
+        time.sleep(20)
+        dump_repos(parent_url+next_page, dr)
 try:
     cmd = sys.argv[1]
+    if not cmd in ["update", "clone"]:
+        ""+1
     if cmd == "update":
         try:
             src_dirs=sys.argv[2]
@@ -61,7 +63,7 @@ try:
             max_count=int(sys.argv[3])
         except:
             print("no max_count specified | usage 4git.py update directory count \nFalling back to max_count:"+str(max_count))
-    elif cmd == "clone":
+    elif cmd in ["clone"]:
         try:
             url=sys.argv[2]
             rname=repo_name.findall(url)
@@ -77,15 +79,13 @@ try:
         try:
             max_count=int(sys.argv[4])
         except:
-            print("no max_count specified | usage 4git.py clone git_repo_parent_url directory count \nFalling back to max_count:"+str(max_count))
+            print("no max_count specified | usage 4git.py chttps://github.com/CoolerVoid?page=2&tab=followinglone git_repo_parent_url directory count \nFalling back to max_count:"+str(max_count))
 except:
-    print("no valid cmd specified | valid cmds clone, update")
-    print("usage 4git.py clone git_repo_parent_url directory count ")
-    print("usage 4git.py update directory count ")
+    print("no valid cmd specified | valid cmds clone, clone_if, update")
+    print("usage 4git.py clone git_repo_parent_url directory count (clones the whole repository of the holder)")
+    print("usage 4git.py update directory count (updates all repositories which directories are childs of directory)")
     exit()
-
 procs=[]
-
 if cmd == "update":
     for sdir in os.walk(src_dirs):
         if(os.path.isdir(sdir[0]+"/.git")):
@@ -96,14 +96,13 @@ if cmd == "update":
             while i > max_count:
                 i=procs_count(regx_update)
                 print("waiting for empty workspace...max_count:"+str(max_count))
-                time.sleep(1)
-
-elif cmd == "clone":
+                time.sleep(7)
+elif cmd in ["clone"]:
     pgs=[]
     if url.find("?q=") == -1:
         rname=repo_name.findall(url)
         rname=rname[0]
-        url=url+"?tab=repositories"
+        url=url+repos_url_add
     else:
         rname=search_regx.findall(url)
         rname=rname[0].replace("+", "_")
@@ -113,4 +112,3 @@ elif cmd == "clone":
     except:
         print("repo_parent name already exists continue with cloning...")
     dump_repos(url, src_dirs+"/"+rname)
-    
