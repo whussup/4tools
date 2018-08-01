@@ -14,43 +14,56 @@
 #
 ########################################################################
 
-# number of parallel update processes
+# number of parallel processes
 max_count=10
 # change this settings for not using github
 # should work for any webinterface based github clone
-parent_url="https://github.com"
 repos_url_add="?tab=repositories"
 
-import os, sys, re, subprocess, time, requests
+import re
 repositories=re.compile("<h3.*?>.*?<a.*?href=\"(.*?)\".*?>.*?</a>.*?</h3>", re.S)
-repo_name=re.compile(parent_url+"/(.*?)$")
+parent_url_regx=re.compile("(.*?)://(.*?)/")
+repo_name=re.compile("^.*?//.*?/(.*?)$")
 search_regx=re.compile(".*?search\?q\=(.*?)$")
 regx_update=re.compile("git pull")
 regx_clone=re.compile("git clone")
 next_page_regx=re.compile("rel=\"next\".*?href=\"(.*?)\">(.*?)</a>")
+del re
+
 def procs_count(regx):
     cmd=["ps", "ax"]
+    import subprocess
     procs=str(subprocess.check_output(cmd))
+    del subprocess
     return int(len(regx.findall(procs)))
 def dump_repos(url, dr):
+    import requests
     r=requests.get(url)
+    del requests
     next_page = next_page_regx.findall(r.text)
     rps=repositories.findall(r.text)
     if rps != []:
         sdir = src_dirs
         for rp in rps:
             cmd=["git", "clone", parent_url+rp]
+            import subprocess
             procs.append(subprocess.Popen(cmd, cwd=dr))
+            del subprocess
             i=procs_count(regx_clone)
             while i > max_count:
                 i=procs_count(regx_clone)
                 print("waiting for empty workspace...max_count:"+str(max_count))
+                import time
                 time.sleep(7)
+                del time
     if next_page != []:
         next_page = next_page.pop()[0]
+        import time
         time.sleep(20)
+        del time
         dump_repos(parent_url+next_page, dr)
 try:
+    import sys
     cmd = sys.argv[1]
     if not cmd in ["update", "clone"]:
         ""+1
@@ -69,7 +82,9 @@ try:
             rname=repo_name.findall(url)
             if rname == []:
                 ""+1
+            import requests
             r=requests.get(url)
+            del requests
         except:
             print("no valid url specified | usage 4git.while py clone git_repo_parent_url directory count \n")
         try:
@@ -80,6 +95,7 @@ try:
             max_count=int(sys.argv[4])
         except:
             print("no max_count specified | usage 4git.py chttps://github.com/CoolerVoid?page=2&tab=followinglone git_repo_parent_url directory count \nFalling back to max_count:"+str(max_count))
+    del sys
 except:
     print("no valid cmd specified | valid cmds clone, clone_if, update")
     print("usage 4git.py clone git_repo_parent_url directory count (clones the whole repository of the holder)")
@@ -87,16 +103,20 @@ except:
     exit()
 procs=[]
 if cmd == "update":
+    import os
     for sdir in os.walk(src_dirs):
         if(os.path.isdir(sdir[0]+"/.git")):
             sdir = sdir[0]
             cmd=["git", "pull"]
+            import subprocess
             procs.append(subprocess.Popen(cmd, cwd=sdir))
+            del subprocess
             i=procs_count(regx_update)
             while i > max_count:
                 i=procs_count(regx_update)
                 print("waiting for empty workspace...max_count:"+str(max_count))
                 time.sleep(7)
+    del os
 elif cmd in ["clone"]:
     pgs=[]
     if url.find("?q=") == -1:
@@ -108,7 +128,15 @@ elif cmd in ["clone"]:
         rname=rname[0].replace("+", "_")
     cmd=["mkdir",rname]
     try:
+        import subprocess
         procs.append(subprocess.Popen(cmd, cwd=src_dirs))
+        del subprocess
     except:
         print("repo_parent name already exists continue with cloning...")
+    parent_url=parent_url_regx.findall(url)
+    if parent_url != []:
+        parent_url=parent_url[0][0]+"://"+parent_url[0][1]
+    else:
+        print("something is wrong with your url..."+url)
+        exit()
     dump_repos(url, src_dirs+"/"+rname)
