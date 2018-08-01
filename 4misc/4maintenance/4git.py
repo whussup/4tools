@@ -77,6 +77,9 @@ if cmd == "update":
     try:
         src_dirs=sys.argv[2]
     except:
+        import os
+        src_dirs=os.getcwd()
+        del os
         print("no source dir specified | usage 4git.py update directory count \nFalling back to cwd..."+src_dirs)
     try:
         max_count=int(sys.argv[3])
