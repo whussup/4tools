@@ -67,40 +67,45 @@ try:
     cmd = sys.argv[1]
     if not cmd in ["update", "clone"]:
         ""+1
-    if cmd == "update":
-        try:
-            src_dirs=sys.argv[2]
-        except:
-            print("no source dir specified | usage 4git.py update directory count \nFalling back to cwd..."+src_dirs)
-        try:
-            max_count=int(sys.argv[3])
-        except:
-            print("no max_count specified | usage 4git.py update directory count \nFalling back to max_count:"+str(max_count))
-    elif cmd in ["clone"]:
-        try:
-            url=sys.argv[2]
-            rname=repo_name.findall(url)
-            if rname == []:
-                ""+1
-            import requests
-            r=requests.get(url)
-            del requests
-        except:
-            print("no valid url specified | usage 4git.while py clone git_repo_parent_url directory count \n")
-        try:
-            src_dirs=sys.argv[3]
-        except:
-            print("no source destination specified | usage 4git.py clone git_repo_parent_url directory count \nFalling back to cwd..."+src_dirs)
-        try:
-            max_count=int(sys.argv[4])
-        except:
-            print("no max_count specified | usage 4git.py chttps://github.com/CoolerVoid?page=2&tab=followinglone git_repo_parent_url directory count \nFalling back to max_count:"+str(max_count))
-    del sys
 except:
-    print("no valid cmd specified | valid cmds clone, clone_if, update")
+    print("no valid cmd specified | valid cmds clone, update")
     print("usage 4git.py clone git_repo_parent_url directory count (clones the whole repository of the holder)")
     print("usage 4git.py update directory count (updates all repositories which directories are childs of directory)")
     exit()
+    
+if cmd == "update":
+    try:
+        src_dirs=sys.argv[2]
+    except:
+        print("no source dir specified | usage 4git.py update directory count \nFalling back to cwd..."+src_dirs)
+    try:
+        max_count=int(sys.argv[3])
+    except:
+        print("no max_count specified | usage 4git.py update directory count \nFalling back to max_count:"+str(max_count))
+elif cmd in ["clone"]:
+    try:
+        url=sys.argv[2]
+        rname=repo_name.findall(url)
+        if rname == []:
+            ""+1
+        import requests
+        r=requests.get(url)
+        del requests
+    except:
+        print("no valid url specified | usage 4git.while py clone git_repo_parent_url directory count")
+    try:
+        src_dirs=sys.argv[3]
+    except:
+        import os
+        src_dirs=os.getcwd()
+        del os
+        print("no source destination specified | usage 4git.py clone git_repo_parent_url directory count \nFalling back to cwd..."+src_dirs)
+    try:
+        max_count=int(sys.argv[4])
+    except:
+        print("no max_count specified | usage 4git.py clone git_repo_parent_url directory count \nFalling back to max_count:"+str(max_count))
+del sys
+
 procs=[]
 if cmd == "update":
     import os
