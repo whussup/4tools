@@ -35,12 +35,10 @@ VERSION=0.0.6
 #  |->                                                                                   #
 #  with cron you can add this to update your git repo collection regularly               #
 #                                                                                        #
-#                                                                                        #
 ######################################## 4BACKUP #########################################
 #                                                                                        #
 # <->mkstage4_gentoo: will create a stage 4 of your operating system                     #
 #  |->                                                                                   #
 #  usefull tool for backup and making your own linux repo stage4s                        #
-#                                                                                        #
 #                                                                                        #
 ##########################################################################################
