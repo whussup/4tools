@@ -18,11 +18,15 @@ VERSION=0.0.2
 # load balance domain names
 #  |-> 4utoBl4ck needs Grsecurity's blackhole patch for ip route to work properly!!!
 #
-# examples for the domainlist domainlist=("example.com" 0 "example.de" 1)
+# SETTINGS
 #
+# global swtich for CIDR / ROUTE BANISH
 activate_banish_cidr=1
-
+# examples for the domainlist domainlist=("example.com" 0 "example.de" 1)
+# 0 banish IP | 1 banish CIDR/ROUTE
 domainlist=()
+#
+#########################################################################################
 
 for (( i=0; i<${#domainlist[@]}; i+=2 ))
 do
