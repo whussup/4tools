@@ -19,9 +19,6 @@ migrate-pax -v | grep FAIL > /var/tmp/.to_flag && sed -i -e "s/FAIL: //g" /var/t
 
 ########################## misc flags ##################################
 #
-# these flags need to be set when you want to use a configured Grsec/Pax 
-# core with:
-#
 # short pax flags howto:
 #
 # if you try starting a binary/application and it will not work do 
@@ -37,7 +34,11 @@ migrate-pax -v | grep FAIL > /var/tmp/.to_flag && sed -i -e "s/FAIL: //g" /var/t
 # in some cases like using python you need trusted path execution 
 # properly configured.
 #
-
+#######################################################################
+#
+# these flags need to be set when you want to use a configured Grsec/Pax 
+# core with:
+#
 #qt desktop
 
 paxctl-ng -m /usr/bin/plasmashell
