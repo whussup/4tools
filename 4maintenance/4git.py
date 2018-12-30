@@ -5,7 +5,7 @@
 #
 # 4git - for collecting, updating and investigating repos @github
 #
-# VERSION 0.0.3
+# VERSION 0.0.4
 #
 # Idea / Written by Sebastian Vivian Gresser - All Rights Reserved
 #
@@ -15,7 +15,7 @@
 ########################################################################
 
 # number of parallel processes
-max_count=10
+max_count=4
 # change this settings for not using github
 # should work for any webinterface based github clone
 repos_url_add="?tab=repositories"
@@ -28,7 +28,18 @@ search_regx=re.compile(".*?search\?q\=(.*?)$")
 regx_update=re.compile("git pull")
 regx_clone=re.compile("git clone")
 next_page_regx=re.compile("rel=\"next\".*?href=\"(.*?)\">(.*?)</a>")
+
+#next_page_ppl_regx=re.compile("<div\sclass=\"pagination\">.*?<a.*?href=\"(.*?)\">Next</a>", re.S)
+ppl_regx=re.compile("<div.*?<a.*data-hovercard-type=\"user\".*href=\"(.*?)\">.*?</a>.*?</div>", re.S)
+
 del re
+
+
+def urllib_get(url):
+    import urllib
+    r=urllib.urlopen(url).read()
+    del urllib
+    return r
 
 def procs_count(regx):
     cmd=["ps", "ax"]
@@ -36,12 +47,11 @@ def procs_count(regx):
     procs=str(subprocess.check_output(cmd))
     del subprocess
     return int(len(regx.findall(procs)))
+
 def dump_repos(url, dr):
-    import requests
-    r=requests.get(url)
-    del requests
-    next_page = next_page_regx.findall(r.text)
-    rps=repositories.findall(r.text)
+    urllib_get(url)
+    next_page = next_page_regx.findall(r)
+    rps=repositories.findall(r)
     if rps != []:
         sdir = src_dirs
         for rp in rps:
@@ -65,14 +75,14 @@ def dump_repos(url, dr):
 try:
     import sys
     cmd = sys.argv[1]
-    if not cmd in ["update", "clone"]:
+    if not cmd in ["update", "clone", "clone_ppl"]:
         ""+1
 except:
-    print("no valid cmd specified | valid cmds clone, update")
+    print("no valid cmd specified | valid cmds clone, clone_ppl, update")
     print("usage 4git.py clone git_repo_parent_url directory count (clones the whole repository of the holder)")
     print("usage 4git.py update directory count (updates all repositories which directories are childs of directory)")
     exit()
-    
+
 if cmd == "update":
     try:
         src_dirs=sys.argv[2]
@@ -85,15 +95,13 @@ if cmd == "update":
         max_count=int(sys.argv[3])
     except:
         print("no max_count specified | usage 4git.py update directory count \nFalling back to max_count:"+str(max_count))
-elif cmd in ["clone"]:
+elif cmd in ["clone", "clone_ppl"]:
     try:
         url=sys.argv[2]
         rname=repo_name.findall(url)
         if rname == []:
             ""+1
-        import requests
-        r=requests.get(url)
-        del requests
+        urllib_get(url)
     except:
         print("no valid url specified | usage 4git.while py clone git_repo_parent_url directory count")
     try:
@@ -148,3 +156,36 @@ elif cmd in ["clone"]:
         print("something is wrong with your url..."+url)
         exit()
     dump_repos(url, src_dirs+"/"+rname)
+
+elif cmd in ["clone_ppl"]:
+    r=urllib_get(url)
+    next_page=next_page_regx.findall(r)
+    #print(next_page)
+    followed=ppl_regx.findall(r)
+    if followed != []:
+        for f in followed:
+            cmd=["python2.7", "4git.py", "clone", "https://github.com"+f, src_dirs, "4" ]
+            print(cmd)
+            #import subprocess
+            #subprocess.Popen(cmd)
+            #del subprocess
+    if next_page != [] and next_page != next_page:
+        next_page=next_page[0].replace("&amp;","&")
+        clone_all(next_page, dr)
+
+def clone_ppl(url, dr):
+    global result
+    print(result)
+    print(url, dr)
+    r=requests.get(sys.argv[1])
+    next_page=next_page_regx.findall(r.text)
+    #print(next_page)
+    followed=ppl_regx.findall(r.text)
+    if followed != []:
+        for f in followed:
+            cmd=["python2.7", "4git.py", "clone", "https://github.com"+f, dr, "4" ]
+            print(cmd)
+            subprocess.Popen(cmd)
+    if next_page != [] and next_page != next_page:
+        next_page=next_page[0].replace("&amp;","&")
+        clone_all(next_page, dr)
