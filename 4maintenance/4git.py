@@ -5,7 +5,7 @@
 #
 # 4git - for collecting, updating and investigating repos @github
 #
-# VERSION 0.0.4
+# VERSION 0.0.5
 #
 # Idea / Written by Sebastian Vivian Gresser - All Rights Reserved
 #

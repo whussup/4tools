@@ -25,9 +25,7 @@ migrate-pax -v | grep FAIL > /var/tmp/.to_flag && sed -i -e "s/FAIL: //g" /var/t
 
 #qt desktop
 
-paxctl-ng -m /usr/bin/firefox
 paxctl-ng -m /usr/bin/plasmashell
-paxctl-ng -m /usr/bin/kmail
 paxctl-ng -m /usr/bin/sddm-greeter
 paxctl-ng -m /usr/bin/kwin_x11
 paxctl-ng -m /usr/lib64/libexec/kscreenlocker-greet
@@ -39,6 +37,7 @@ paxctl-ng -m /usr/bin/systemsettings5
 #gtk desktop
 #...
 
-#misc
-#...
+#misc applications
 
+paxctl-ng -m /usr/bin/firefox
+paxctl-ng -m /usr/bin/kmail
