@@ -22,6 +22,21 @@ migrate-pax -v | grep FAIL > /var/tmp/.to_flag && sed -i -e "s/FAIL: //g" /var/t
 # these flags need to be set when you want to use a configured Grsec/Pax 
 # core with:
 #
+# short pax flags howto:
+#
+# if you try starting a binary/application and it will not work do 
+# following (with logging for grsec/pax enabled in your core):
+#
+# #root dmesg
+#
+# check for violations...
+#
+# and set according flags in most cases it will be -m 
+# (disabling Memory Protection)
+# 
+# in some cases like using python you need trusted path execution 
+# properly configured.
+#
 
 #qt desktop
 
