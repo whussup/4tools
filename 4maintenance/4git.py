@@ -42,10 +42,17 @@ next_page_regx=False
 del re
 
 def urllib_get(url):
-    import urllib
-    r=urllib.urlopen(url).read()
-    del urllib
-    return r
+    if version == "2":
+        import urllib
+        r=urllib.urlopen(url).read()
+        del urllib
+        return r
+    elif version == "3":
+        import urllib3
+        http=urllib3.PoolManager()
+        req=http.request("get", url)
+        del urllib3
+        return str(req)
 
 def procs_count(regx):
     cmd=["ps", "ax"]
@@ -125,6 +132,7 @@ elif cmd in ["clone", "clone_ppl"]:
         print("no max_count specified | usage 4git.py clone git_repo_parent_url directory count \nFalling back to max_count:"+str(max_count))
 
 script_origin=sys.argv[0]
+version=sys.version[0]
 del sys
 
 procs=[]
