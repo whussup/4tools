@@ -5,7 +5,7 @@
 #
 # 4git - for collecting, updating and investigating repos @github
 #
-# VERSION 0.0.5
+# VERSION 0.0.6
 #
 # Idea / Written by Sebastian Vivian Gresser - All Rights Reserved
 #
@@ -13,12 +13,18 @@
 # Copyright (C) by Sebastian Vivian Gresser - All Rights Reserved
 #
 ########################################################################
+#
+# Should work for any webinterface based github clone.
+# You maybe need to make minor changes to the regx and url_adds for github clones.
+# As far as I know it is working for the parrot linux github clone.
 
 # number of parallel processes
-max_count=4
 # change this settings for not using github
-# should work for any webinterface based github clone
+
+max_count=2
+
 repos_url_add="?tab=repositories"
+follow_url_add={"following":"?tab=following", "followers":"?tab=followers"}
 
 import re
 repositories=re.compile("<h3.*?>.*?<a.*?href=\"(.*?)\".*?>.*?</a>.*?</h3>", re.S)
@@ -27,13 +33,13 @@ repo_name=re.compile("^.*?//.*?/(.*?)$")
 search_regx=re.compile(".*?search\?q\=(.*?)$")
 regx_update=re.compile("git pull")
 regx_clone=re.compile("git clone")
-next_page_regx=re.compile("rel=\"next\".*?href=\"(.*?)\">(.*?)</a>")
+ppl_regx=re.compile("<a.*?data-hovercard-type=\"user\".*?href=\"(.*?)\">")
 
-#next_page_ppl_regx=re.compile("<div\sclass=\"pagination\">.*?<a.*?href=\"(.*?)\">Next</a>", re.S)
-ppl_regx=re.compile("<div.*?<a.*data-hovercard-type=\"user\".*href=\"(.*?)\">.*?</a>.*?</div>", re.S)
+#github does not really want to be scraped so following next pages is disabled
+#next_page_regx=regx=re.compile("</button><a.*?href=\"(.*?)\">Next</a>")
+next_page_regx=False
 
 del re
-
 
 def urllib_get(url):
     import urllib
@@ -49,8 +55,9 @@ def procs_count(regx):
     return int(len(regx.findall(procs)))
 
 def dump_repos(url, dr):
-    urllib_get(url)
-    next_page = next_page_regx.findall(r)
+    r=urllib_get(url)
+    if next_page_regx:
+        next_page = next_page_regx.findall(r)
     rps=repositories.findall(r)
     if rps != []:
         sdir = src_dirs
@@ -66,7 +73,7 @@ def dump_repos(url, dr):
                 import time
                 time.sleep(7)
                 del time
-    if next_page != []:
+    if next_page_regx and next_page != []:
         next_page = next_page.pop()[0]
         import time
         time.sleep(20)
@@ -80,6 +87,7 @@ try:
 except:
     print("no valid cmd specified | valid cmds clone, clone_ppl, update")
     print("usage 4git.py clone git_repo_parent_url directory count (clones the whole repository of the holder)")
+    print("usage 4git.py clone_ppl git_repo_parent_url directory count (clones all repositories of the holder's social connections)")
     print("usage 4git.py update directory count (updates all repositories which directories are childs of directory)")
     exit()
 
@@ -115,6 +123,8 @@ elif cmd in ["clone", "clone_ppl"]:
         max_count=int(sys.argv[4])
     except:
         print("no max_count specified | usage 4git.py clone git_repo_parent_url directory count \nFalling back to max_count:"+str(max_count))
+
+script_origin=sys.argv[0]
 del sys
 
 procs=[]
@@ -158,34 +168,31 @@ elif cmd in ["clone"]:
     dump_repos(url, src_dirs+"/"+rname)
 
 elif cmd in ["clone_ppl"]:
-    r=urllib_get(url)
-    next_page=next_page_regx.findall(r)
-    #print(next_page)
-    followed=ppl_regx.findall(r)
-    if followed != []:
-        for f in followed:
-            cmd=["python2.7", "4git.py", "clone", "https://github.com"+f, src_dirs, "4" ]
-            print(cmd)
-            #import subprocess
-            #subprocess.Popen(cmd)
-            #del subprocess
-    if next_page != [] and next_page != next_page:
-        next_page=next_page[0].replace("&amp;","&")
-        clone_all(next_page, dr)
-
-def clone_ppl(url, dr):
-    global result
-    print(result)
-    print(url, dr)
-    r=requests.get(sys.argv[1])
-    next_page=next_page_regx.findall(r.text)
-    #print(next_page)
-    followed=ppl_regx.findall(r.text)
-    if followed != []:
-        for f in followed:
-            cmd=["python2.7", "4git.py", "clone", "https://github.com"+f, dr, "4" ]
-            print(cmd)
-            subprocess.Popen(cmd)
-    if next_page != [] and next_page != next_page:
-        next_page=next_page[0].replace("&amp;","&")
-        clone_all(next_page, dr)
+    rname=repo_name.findall(url)
+    rname=rname[0].replace("+", "_")
+    cmd = ["mkdir", rname]
+    import subprocess
+    subprocess.Popen(cmd, cwd=src_dirs)
+    del subprocess
+    for fua in follow_url_add:
+        cmd = ["mkdir", rname+"/"+fua]
+        import subprocess
+        subprocess.Popen(cmd, cwd=src_dirs)
+        del subprocess
+        r=urllib_get(url+follow_url_add[fua])
+        if next_page_regx:
+            next_page=next_page_regx.findall(r)
+        follow=ppl_regx.findall(r)
+        if follow != []:
+            ppl_done=[]
+            for f in xrange(len(follow)):
+                if f % 2 == 0:
+                    continue
+                else:
+                    cmd=["python", script_origin, "clone", "https://github.com"+follow[f], src_dirs+"/"+rname+"/"+fua, max_count]
+                    import subprocess
+                    subprocess.Popen(cmd)
+                    del subprocess
+        if next_page_regx and next_page != [] and next_page != next_page:
+            next_page=next_page[0].replace("&amp;","&")
+            clone_all(next_page, dr)

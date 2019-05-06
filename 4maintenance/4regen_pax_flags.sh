@@ -28,11 +28,11 @@ migrate-pax -v | grep FAIL > /var/tmp/.to_flag && sed -i -e "s/FAIL: //g" /var/t
 #
 # check for violations...
 #
-# and set according flags in most cases it will be -m 
-# (disabling Memory Protection)
+# and set according flags. In most cases it will be -m
+# (disabling Memory Protection).
 # 
 # in some cases like using python you need trusted path execution 
-# properly configured.
+# configured properly.
 #
 #######################################################################
 #
