@@ -5,7 +5,7 @@
 #
 # 4git - for collecting, updating and investigating repos @github
 #
-# VERSION 0.0.6
+# VERSION 0.0.7
 #
 # Idea / Written by Sebastian Vivian Gresser - All Rights Reserved
 #
@@ -197,7 +197,8 @@ elif cmd in ["clone_ppl"]:
                 if f % 2 == 0:
                     continue
                 else:
-                    cmd=["python", script_origin, "clone", "https://github.com"+follow[f], src_dirs+"/"+rname+"/"+fua, max_count]
+                    cmd=["python", script_origin, "clone", "https://github.com"+follow[f], src_dirs+"/"+rname+"/"+fua, str(max_count)]
+                    print(cmd)
                     import subprocess
                     subprocess.Popen(cmd)
                     del subprocess
