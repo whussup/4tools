@@ -9,7 +9,6 @@
 #
 # Idea / Written by Sebastian Vivian Gresser - All Rights Reserved
 #
-# Copyright (C) by geeBee UG (haftungsbeschränkt) - All Rights Reserved
 # Copyright (C) by Sebastian Vivian Gresser - All Rights Reserved
 #
 ########################################################################
