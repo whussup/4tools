@@ -148,7 +148,9 @@ if cmd == "update":
             while i > max_count:
                 i=procs_count(regx_update)
                 print("waiting for empty workspace...max_count:"+str(max_count))
+                import time
                 time.sleep(7)
+                del time
     del os
 elif cmd in ["clone"]:
     pgs=[]
