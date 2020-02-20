@@ -5,7 +5,7 @@
 #
 # 4git - for collecting, updating and investigating repos @github
 #
-# VERSION 0.0.7
+# VERSION 0.0.9
 #
 # Idea / Written by Sebastian Vivian Gresser - All Rights Reserved
 #
@@ -105,10 +105,10 @@ if cmd == "update":
         src_dirs=os.getcwd()
         del os
         print("no source dir specified | usage 4git.py update directory count \nFalling back to cwd..."+src_dirs)
-    try:
+    """try:
         max_count=int(sys.argv[3])
     except:
-        print("no max_count specified | usage 4git.py update directory count \nFalling back to max_count:"+str(max_count))
+        print("no max_count specified | usage 4git.py update directory count \nFalling back to max_count:"+str(max_count))"""
 elif cmd in ["clone", "clone_ppl"]:
     try:
         url=sys.argv[2]
@@ -125,10 +125,10 @@ elif cmd in ["clone", "clone_ppl"]:
         src_dirs=os.getcwd()
         del os
         print("no source destination specified | usage 4git.py clone git_repo_parent_url directory count \nFalling back to cwd..."+src_dirs)
-    try:
+    """try:
         max_count=int(sys.argv[4])
     except:
-        print("no max_count specified | usage 4git.py clone git_repo_parent_url directory count \nFalling back to max_count:"+str(max_count))
+        print("no max_count specified | usage 4git.py clone git_repo_parent_url directory count \nFalling back to max_count:"+str(max_count))"""
 
 script_origin=sys.argv[0]
 version=sys.version[0]
