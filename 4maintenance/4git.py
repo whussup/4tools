@@ -5,7 +5,7 @@
 #
 # 4git - for collecting, updating and investigating repos @github
 #
-# VERSION 0.0.9
+# VERSION 0.0.10
 #
 # Idea / Written by Sebastian Vivian Gresser - All Rights Reserved
 #
@@ -16,6 +16,7 @@
 # Should work for any webinterface based github clone.
 # You maybe need to make minor changes to the regx and url_adds for github clones.
 # As far as I know it is working for the parrot linux github clone.
+# Windows users need to run this within a cygwin emulator environment including the ps command to not get banned for spamming any github like interface!
 
 # number of parallel processes
 # change this settings for not using github
@@ -26,7 +27,8 @@ repos_url_add="?tab=repositories"
 follow_url_add={"following":"?tab=following", "followers":"?tab=followers"}
 
 import re
-repositories=re.compile("<h3.*?>.*?<a.*?href=\"(.*?)\".*?>.*?</a>.*?</h3>", re.S)
+repositories=[re.compile("<h3.*?>(.*?)</h3>", re.S), re.compile("<a.*?href=\"(.*?)\".*?>.*?</a>", re.S)]
+
 parent_url_regx=re.compile("(.*?)://(.*?)/")
 repo_name=re.compile("^.*?//.*?/(.*?)$")
 search_regx=re.compile(".*?search\?q\=(.*?)$")
@@ -35,7 +37,7 @@ regx_clone=re.compile("git clone")
 ppl_regx=re.compile("<a.*?data-hovercard-type=\"user\".*?href=\"(.*?)\">")
 
 #github does not really want to be scraped so following next pages is disabled
-#next_page_regx=regx=re.compile("</button><a.*?href=\"(.*?)\">Next</a>")
+#next_page_regx=re.compile("<a.*?href=\"(.*?)\">Next</a>")
 next_page_regx=False
 
 del re
@@ -47,11 +49,11 @@ def urllib_get(url):
         del urllib
         return r
     elif version == "3":
-        import urllib3
-        http=urllib3.PoolManager()
-        req=http.request("get", url)
-        del urllib3
-        return str(req)
+        import urllib.request
+        r=urllib.request.Request(url)
+        r=urllib.request.urlopen(r).read()
+        del urllib.request
+        return r
 
 def procs_count(regx):
     cmd=["ps", "ax"]
@@ -61,13 +63,17 @@ def procs_count(regx):
     return int(len(regx.findall(procs)))
 
 def dump_repos(url, dr):
-    r=urllib_get(url)
+    r=str(urllib_get(url))
     if next_page_regx:
         next_page = next_page_regx.findall(r)
-    rps=repositories.findall(r)
+    rps=repositories[0].findall(r)
     if rps != []:
         sdir = src_dirs
         for rp in rps:
+            try:
+                rp=repositories[1].findall(rp)[0]
+            except:
+                continue
             cmd=["git", "clone", parent_url+rp]
             import subprocess
             procs.append(subprocess.Popen(cmd, cwd=dr))
@@ -80,7 +86,7 @@ def dump_repos(url, dr):
                 time.sleep(7)
                 del time
     if next_page_regx and next_page != []:
-        next_page = next_page.pop()[0]
+        next_page = next_page.pop()
         import time
         time.sleep(20)
         del time
@@ -89,6 +95,7 @@ try:
     import sys
     cmd = sys.argv[1]
     if not cmd in ["update", "clone", "clone_ppl"]:
+        del sys
         ""+1
 except:
     print("no valid cmd specified | valid cmds clone, clone_ppl, update")

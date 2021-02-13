@@ -1,10 +1,10 @@
 #!/bin/bash
 
-VERSION=0.1.0
+VERSION=0.1.1
 
 ##########################################################################################
 #                                                                                        #
-# 4Toolz Collection 0.1.0 (4Toolz)                                                       #
+# 4Toolz Collection 0.1.1 (4Toolz)                                                       #
 #                                                                                        #
 # Idea / Written by Sebastian Vivian Gresser - All Rights Reserved                       #
 #                                                                                        #
@@ -12,8 +12,8 @@ VERSION=0.1.0
 #                                                                                        #
 ##########################################################################################
 #                                                                                        #
-# WARRANTY AND RESPONSIBILITY: there is no warranty you are responsible on your own      #
-#                              how you are using this tool set.                          #
+# WARRANTY AND RESPONSIBILITY: There is no warranty! You are responsible on your own     #
+#                              how you are using this set of tools.                      #
 #                                                                                        #
 ##########################################################################################
 #                                                                                        #
@@ -23,7 +23,8 @@ VERSION=0.1.0
 #                                                                                        #
 ########################################## 4NET ##########################################
 #                                                                                        #
-# <->4utoBl4ck: will blackhole any suspicious ips or domains in the domainlist           #
+# <->4utoBl4ck: will blackhole any suspicious ips or ranges of ips resolved from a given #
+#               domainlist                                                               #
 #  |-> 4utoBl4ck needs Grsecurity's blackhole patch for ip route to work properly!!!     #
 #  with cron you can add this to auto-blackhole any network if you have their            #
 #  load balance domain names                                                             #
@@ -34,10 +35,14 @@ VERSION=0.1.0
 #  |->                                                                                   #
 #  with cron you can add this to update your git repo collection regularly               #
 #                                                                                        #
+# <->4regen_pax_flags: - regenerating default pax flags using paxctl-ng and migrate-pax  #                       #  |->                                                                                   #
+#  usefull if your system is vanilla like and libs and binaries are compiled from sources#
+#  to benefit from the generated individual entropy of your kernel/compilers             #
+#                                                                                        #
 ######################################## 4BACKUP #########################################
 #                                                                                        #
 # <->mkstage4_gentoo: will create a stage 4 of your operating system                     #
 #  |->                                                                                   #
-#  usefull tool for backup and making your own linux repo stage4s                        #
+#  usefull tool for backup and making your own linux repo stage4s including xattrs       #
 #                                                                                        #
 ##########################################################################################
